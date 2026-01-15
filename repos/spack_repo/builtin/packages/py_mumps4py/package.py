@@ -44,7 +44,7 @@ class PyMumps4py(PythonPackage):
         pip = spec["python"].command
         pip.add_default_arg("-m", "pip")
 
-        args = PythonPipBuilder.std_args(pkg) + [f"--prefix={prefix}"]
+        args = PythonPipBuilder.std_args(self.__class__) + [f"--prefix={prefix}"]
 
         config_settings = self.config_settings(spec, prefix)
         for setting in config_settings:
