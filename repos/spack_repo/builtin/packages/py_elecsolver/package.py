@@ -9,7 +9,7 @@ from spack_repo.builtin.build_systems.python import PythonPackage
 from spack.package import *
 
 
-class PyElecSolver(PythonPackage):
+class PyElecsolver(PythonPackage):
     """Formalizes electric systems as linear problems for temporal and frequency-domain studies."""
 
     homepage = "https://github.com/williampiat3/ElecSolver"
