@@ -21,6 +21,7 @@ class PyPythonMumps(PythonPackage):
     version("0.0.6", sha256="58c33104f77c448e127e9e6da316f71dfb1a17719ecf022634669d513306b1fa")
 
     variant("mpi", default=True, description="Whether to have MPI support on python-mumps or not")
+    variant("cuda", default=False, description="Whether to have CUDA support on python-mumps or not")
 
     # build dependencies
     with default_args(type="build"):
@@ -43,9 +44,12 @@ class PyPythonMumps(PythonPackage):
     depends_on("py-pytest", type="test")
 
     # External solver
-    depends_on("xkblas+pkgconfig")
-    depends_on("mumps+float+complex+double+metis+scotch+pkgconfig+cuda", when="+mpi")
-    depends_on("mumps~mpi+float+complex+double+metis+scotch+pkgconfig+cuda", when="~mpi")
+    depends_on("xkblas+pkgconfig", when="+cuda")
+    depends_on("mumps+float+complex+double+metis+scotch+pkgconfig+cuda", when="+mpi+cuda")
+    depends_on("mumps~mpi+float+complex+double+metis+scotch+pkgconfig+cuda", when="~mpi+cuda")
+
+    depends_on("mumps+float+complex+double+metis+scotch+pkgconfig", when="+mpi~cuda")
+    depends_on("mumps~mpi+float+complex+double+metis+scotch+pkgconfig", when="~mpi~cuda")
 
     patch("patch_xkblas.patch")
     patch("patch_meson_build.patch")
