@@ -1,0 +1,16 @@
+diff --git a/meson.build b/meson.build
+index 67c5ea0..56dbbbe 100644
+--- a/meson.build
++++ b/meson.build
+@@ -47,5 +47,10 @@ foreach mumps_name : mumps_names
+     # Neither found -> error
+     error('MUMPS dependency not found: ' + mumps_name + '. Also tried short name if applicable.')
+ endforeach
+-
++# Some MUMPS builds (e.g. via Spack) require xkblas symbols at runtime.
++# Add it explicitly when available so the extension links/loads it.
++xkblas_dep = dependency('xkblas', required: false)
++if xkblas_dep.found()
++    mumps_deps += xkblas_dep
++endif
+ subdir('src/mumps')
