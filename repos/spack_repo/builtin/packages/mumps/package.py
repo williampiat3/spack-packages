@@ -66,7 +66,8 @@ class Mumps(Package):
         description="Allow BLAS calls in OpenMP regions "
         + "(warning: might not be supported by all multithread BLAS)",
     )
-
+    variant("pkgconfig", default=False, description="Create unofficial pkgconfig files")
+    variant("cuda", default=False, description="Cuda support for mumps")
     depends_on("c", type="build")  # generated
     depends_on("fortran", type="build")  # generated
 
@@ -79,6 +80,11 @@ class Mumps(Package):
     depends_on("scalapack", when="+mpi")
     depends_on("mpi", when="+mpi")
     depends_on("gmake", type="build")
+    ## GPU build
+    depends_on("xkblas",when="+cuda")
+    depends_on("cuda@:12.9.1",when="+cuda" )
+
+
 
     patch("examples.patch", when="@5.1.1%clang^spectrum-mpi")
     patch("gfortran8.patch", when="@5.1.2")
@@ -93,6 +99,7 @@ class Mumps(Package):
     conflicts("+parmetis", when="~metis", msg="You cannot use the parmetis variant without metis")
     conflicts("+ptscotch", when="~mpi", msg="You cannot use the ptscotch variant without mpi")
     conflicts("+blr_mt", when="~openmp", msg="You cannot use the blr_mt variant without openmp")
+    conflicts("+cuda", when="@:5.8", msg="GPU offloading is only available from MUMPS 5.9")
 
     @when("+incfort")
     def patch(self):
@@ -175,7 +182,9 @@ class Mumps(Package):
             )
 
             orderings.append("-Dmetis")
-
+        if "+pkgconfig" in self.spec:
+            # Keeping orderings in case we have to create pkg_config files
+            self.orderings = orderings
         makefile_conf.append("ORDERINGSF = %s" % (" ".join(orderings)))
 
         # Determine which compiler suite we are using
@@ -267,6 +276,21 @@ class Mumps(Package):
         # prevents this.
         if using_intel or using_oneapi:
             optl.append("-nofor-main")
+            
+        if "+cuda" in self.spec:
+            optf.append("-DUSE_GPU")
+            optc.append("-DUSE_GPU")
+            optc.append("-I{}".format(self.spec["cuda"].prefix.include))
+            optl.append("-L{}/lib64".format(self.spec["cuda"].prefix))
+            optl.append("-lcublas")
+            optl.append("-lcudart")
+            
+            optf.append("-DUSE_XKBLAS")
+            optc.append("-DUSE_XKBLAS")
+            optc.append("-I{}".format(self.spec["xkblas"].prefix.include))
+            optl.append("-L{}/lib".format(self.spec["xkblas"].prefix))
+            optl.append("-lxkblas")
+            optl.append("-lkaapi")
 
         makefile_conf.extend(
             [
@@ -440,6 +464,56 @@ class Mumps(Package):
                     if "+complex" in spec:
                         zsimpletest = Executable("./zsimpletest")
                         zsimpletest(input="input_simpletest_cmplx")
+
+    @run_after("install", when="+pkgconfig")
+    def create_pkgconfig(self):
+        """Create unofficial pkgconfig files for mumps libraries"""
+        libdir = join_path(self.prefix, "lib")
+        pkg_path = join_path(libdir, "pkgconfig")
+        mkdirp(pkg_path)
+        precision_desc = {
+            "s": "single",
+            "d": "double",
+            "c": "complex single",
+            "z": "complex double",
+        }
+        orderings = [ordering[2:] for ordering in self.orderings]
+        if len(orderings) > 1:
+            ord_desc = "with the following orderings available: "
+            ord_desc += ", ".join(orderings[:-1])
+            ord_desc += f" and {orderings[-1]}"
+        else:
+            ord_desc = f"with the {orderings[0]} ordering available"
+
+        if "+mpi" in self.spec:
+            parallel_desc = "parallel"
+        else:
+            parallel_desc = "sequential"
+        for char in "zscd":
+            if (
+                ("+float" in self.spec and char == "s")
+                or ("+double" in self.spec and char == "d")
+                or ("+complex" in self.spec and "+float" in self.spec and char == "c")
+                or ("+complex" in self.spec and "+double" in self.spec and char == "z")
+            ):
+                with open(join_path(pkg_path, f"{char}mumps.pc"), "w") as f:
+                    desc = f"The {parallel_desc} {precision_desc[char]} MUMPS library {ord_desc}"
+                    f.write(
+                        "\n".join(
+                            [
+                                f"prefix={self.prefix}",
+                                "exec_prefix=${prefix}",
+                                "includedir=${prefix}/include",
+                                "libdir=${exec_prefix}/lib",
+                                "",
+                                f"Name: {char}mumps",
+                                f"Description: {desc}",
+                                f"Version: {self.version}",
+                                "Cflags: -I${includedir}",
+                                f"Libs: -L${{libdir}} -l{char}mumps",
+                            ]
+                        )
+                    )
 
     @property
     def libs(self):
