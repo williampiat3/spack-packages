@@ -6,6 +6,7 @@ from spack_repo.builtin.build_systems.cmake import CMakePackage
 
 from spack.package import *
 
+
 class Xkblas(CMakePackage):
     """
     XKBlas is a BLAS library for multi-GPUs servers similar to CUBLASXt but with
@@ -39,20 +40,31 @@ class Xkblas(CMakePackage):
     depends_on("cuda@12.9.1", when="+cuda")
     depends_on("rocm", when="+rocm")
 
-    conflicts("+mkl", when="+openblas", msg="MKL and OpenBLAS support cannot be enabled at the same time.")
-    conflicts("+cuda", when="+rocm", msg="CUDA and ROCm support cannot be enabled at the same time.")
-
+    conflicts(
+        "+mkl",
+        when="+openblas",
+        msg="MKL and OpenBLAS support cannot be enabled at the same time.",
+    )
+    conflicts(
+        "+cuda", when="+rocm", msg="CUDA and ROCm support cannot be enabled at the same time."
+    )
 
     def cmake_args(self):
-        args = [self.define_from_variant("KAAPI_USE_CUDA_RT", "cuda"),
-                self.define_from_variant("KAAPI_USE_HIP", "rocm"),
-                self.define_from_variant("KAAPI_USE_MKL", "mkl"),
-                self.define_from_variant("KAAPI_USE_OPENBLAS", "openblas"),
-                self.define_from_variant("ENABLE_KAAPI_UNIFIED", "unified")]
+        args = [
+            self.define_from_variant("KAAPI_USE_CUDA_RT", "cuda"),
+            self.define_from_variant("KAAPI_USE_HIP", "rocm"),
+            self.define_from_variant("KAAPI_USE_MKL", "mkl"),
+            self.define_from_variant("KAAPI_USE_OPENBLAS", "openblas"),
+            self.define_from_variant("ENABLE_KAAPI_UNIFIED", "unified"),
+        ]
         if self.spec.satisfies("+openblas"):
-            args.append(self.define("BLAS_LIBRARIES", join_path(self.spec["openblas"].prefix.lib,"libopenblas.so")))
+            args.append(
+                self.define(
+                    "BLAS_LIBRARIES", join_path(self.spec["openblas"].prefix.lib, "libopenblas.so")
+                )
+            )
             args.append(self.define("BLAS_INCLUDE_DIRS", self.spec["openblas"].prefix.include))
-        args.append(self.define("KAAPI_BUILD_TESTING",True))
+        # args.append(self.define("KAAPI_BUILD_TESTING", True))
         return args
 
     @run_after("install", when="+pkgconfig")
@@ -64,15 +76,18 @@ class Xkblas(CMakePackage):
 
         with open(join_path(pkg_path, "xkblas.pc"), "w") as f:
             f.write(
-                f"""prefix={self.prefix}
-        exec_prefix=${{prefix}}
-        includedir=${{prefix}}/include
-        libdir=${{exec_prefix}}/lib
-
-        Name: xkblas
-        Description: XKBlas is a BLAS library for multi-GPUs servers
-        Version: {self.version}
-        Cflags: -I${{includedir}}
-        Libs: -L${{libdir}} -lkaapi -lxkblas
-        """
+                "\n".join(
+                    [
+                        f"prefix={self.prefix}",
+                        "exec_prefix=${prefix}",
+                        "includedir=${prefix}/include",
+                        "libdir=${exec_prefix}/lib",
+                        "",
+                        "Name: xkblas",
+                        "Description: XKBlas is a BLAS library for multi-GPUs servers",
+                        f"Version: {self.version}",
+                        "Cflags: -I${includedir}",
+                        "Libs: -L${libdir} -lkaapi -lxkblas",
+                    ]
+                )
             )
