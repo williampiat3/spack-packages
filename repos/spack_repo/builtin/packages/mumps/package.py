@@ -355,6 +355,8 @@ class Mumps(Package):
             elif "+metis" in self.spec:
                 inject_libs += ["-L%s -l%s" % (self.spec["metis"].prefix.lib, "metis")]
             inject_libs += [lapack_blas.ld_flags]
+            if "+cuda" in self.spec:
+                inject_libs += [self.spec["xkblas"].libs.ld_flags]
             inject_libs = " ".join(inject_libs)
 
             if sys.platform == "darwin":
