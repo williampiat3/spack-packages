@@ -14,13 +14,13 @@ class Xkblas(CMakePackage):
     """
 
     homepage = "https://gitlab.inria.fr/xkblas"
-    url = "https://gitlab.inria.fr/xkblas/versions/-/raw/master/xkblas-v0.6.0-34-g7dbbea2c.tgz"
+    url = "https://github.com/williampiat3/xkblas/archive/refs/tags/v0.6.0.tar.gz"
 
     maintainers("williampiat3")
 
     license("CeCILL-C", checked_by="Thierry Gautier")
 
-    version("0.6.0", sha256="2acb60bd9ee17c131922f5006b4cc70b001bf0c2a80d55471d01880aef3c9c48")
+    version("0.6.0", sha256="1e3d6a9f7a09f15cc76d46583843a69e769b68252791dc13460548c4b54212bf")
 
     variant("mkl", default=False, description="Build with MKL support")
     variant("openblas", default=True, description="Build with OpenBLAS support")
