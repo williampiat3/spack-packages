@@ -19,7 +19,7 @@ class Xkblas(CMakePackage):
     maintainers("williampiat3")
 
     license("CeCILL-C", checked_by="Thierry Gautier")
-
+    version("0.6.1",sha256="e038315be4b5d71f25bf2f8bb10f6a7629f06af985a45c09fcfb0f8948565212")
     version("0.6.0", sha256="1e3d6a9f7a09f15cc76d46583843a69e769b68252791dc13460548c4b54212bf")
 
     variant("mkl", default=False, description="Build with MKL support")
