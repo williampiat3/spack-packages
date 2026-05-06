@@ -64,7 +64,7 @@ class Xkblas(CMakePackage):
                 )
             )
             args.append(self.define("BLAS_INCLUDE_DIRS", self.spec["openblas"].prefix.include))
-        # args.append(self.define("KAAPI_BUILD_TESTING", True))
+        args.append(self.define("KAAPI_BUILD_TESTING", True))
         return args
 
     @run_after("install", when="+pkgconfig")
