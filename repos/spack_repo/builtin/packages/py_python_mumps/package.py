@@ -25,6 +25,7 @@ class PyPythonMumps(PythonPackage):
 
     # build dependencies
     with default_args(type="build"):
+        depends_on("cxx")
         depends_on("meson@1.8:")
         depends_on("ninja")
         depends_on("py-meson-python@0.18:")
