@@ -25,6 +25,7 @@ class PyPythonMumps(PythonPackage):
 
     # build dependencies
     with default_args(type="build"):
+        depends_on("c")
         depends_on("cxx")
         depends_on("meson@1.8:")
         depends_on("ninja")
@@ -49,15 +50,15 @@ class PyPythonMumps(PythonPackage):
     depends_on("mumps+float+complex+double+metis+scotch+pkgconfig+cuda", when="+mpi+cuda")
     depends_on("mumps~mpi+float+complex+double+metis+scotch+pkgconfig+cuda", when="~mpi+cuda")
 
-    depends_on("mumps+float+complex+double+metis+scotch+pkgconfig", when="+mpi~cuda")
-    depends_on("mumps~mpi+float+complex+double+metis+scotch+pkgconfig", when="~mpi~cuda")
+    depends_on("mumps+float+complex+double+metis+scotch+pkgconfig~cuda", when="+mpi~cuda")
+    depends_on("mumps~mpi+float+complex+double+metis+scotch+pkgconfig~cuda", when="~mpi~cuda")
 
-    patch("patch_xkblas.patch")
+    patch("patch_xkblas.patch", when="+cuda")
     patch("patch_meson_build.patch")
 
     def setup_build_environment(self, env):
+        env.set("CC", self.compiler.cc)
         env.set("CXX", self.compiler.cxx)
-
 
     @run_before("install")
     def setup_meson(self) -> None:

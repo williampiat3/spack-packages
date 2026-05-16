@@ -276,7 +276,7 @@ class Mumps(Package):
         # prevents this.
         if using_intel or using_oneapi:
             optl.append("-nofor-main")
-            
+
         if "+cuda" in self.spec:
             optf.append("-DUSE_GPU")
             optc.append("-DUSE_GPU")
@@ -284,7 +284,7 @@ class Mumps(Package):
             optl.append("-L{}/lib64".format(self.spec["cuda"].prefix))
             optl.append("-lcublas")
             optl.append("-lcudart")
-            
+
             optf.append("-DUSE_XKBLAS")
             optc.append("-DUSE_XKBLAS")
             optc.append("-I{}".format(self.spec["xkblas"].prefix.include))
