@@ -25,6 +25,7 @@ class PyPlaid(PythonPackage):
 
     # FIXME: Add additional dependencies if required.
     with default_args(type=("build","run")):
+        depends_on("python@:3.13")
         depends_on("py-pyyaml")
         depends_on("py-pycgns")
         depends_on("py-zarr")
