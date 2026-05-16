@@ -19,7 +19,7 @@ class PyPlaid(PythonPackage):
     version("0.1.15", sha256="e596ee155804da31793af0ee8f0e93c5fe629e246cbdca87dcae741a1e1f1205")
 
     with default_args(type="build"):
-        depends_on("py-setuptools")
+        depends_on("py-setuptools@:76.1.0")
         depends_on("py-setuptools-scm")
 
 
