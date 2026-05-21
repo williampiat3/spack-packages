@@ -17,14 +17,17 @@ class PyPlaid(PythonPackage):
 
     version("0.1.15", sha256="e596ee155804da31793af0ee8f0e93c5fe629e246cbdca87dcae741a1e1f1205")
 
+    # Build deps
     with default_args(type="build"):
         depends_on("py-setuptools@60:76.1.0")
         depends_on("py-setuptools-scm@8:")
-
-
-    # FIXME: Add additional dependencies if required.
+        
+    # Build and run deps
     with default_args(type=("build","run")):
-        depends_on("python@:3.12")
+        depends_on("python@:3.13")
+
+    # Run deps 
+    with default_args(type=("run")):
         depends_on("py-pyyaml@6:")
         depends_on("py-pycgns@6:") # only 6.3 is available on spack
         depends_on("py-zarr@3.1:")
