@@ -19,19 +19,19 @@ class PyPlaid(PythonPackage):
     version("0.1.15", sha256="e596ee155804da31793af0ee8f0e93c5fe629e246cbdca87dcae741a1e1f1205")
 
     with default_args(type="build"):
-        depends_on("py-setuptools@:76.1.0")
-        depends_on("py-setuptools-scm")
+        depends_on("py-setuptools@60:76.1.0")
+        depends_on("py-setuptools-scm@8:")
 
 
     # FIXME: Add additional dependencies if required.
     with default_args(type=("build","run")):
-        depends_on("python@:3.13")
-        depends_on("py-pyyaml")
-        depends_on("py-pycgns")
-        depends_on("py-zarr")
-        depends_on("py-scikit-learn")
-        depends_on("py-datasets")
-        depends_on("py-numpy")
-        depends_on("py-matplotlib")
-        depends_on("py-pydantic")
+        depends_on("python@:3.12")
+        depends_on("py-pyyaml@6:")
+        depends_on("py-pycgns@6:") # only 6.3 is available on spack
+        depends_on("py-zarr@3.1:")
+        depends_on("py-scikit-learn@1.4")
+        depends_on("py-datasets@2.18:4")
+        depends_on("py-numpy@1.26:2")
+        depends_on("py-matplotlib@3.8:")
+        depends_on("py-pydantic@2.6:")
 
