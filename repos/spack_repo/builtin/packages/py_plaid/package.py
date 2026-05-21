@@ -13,7 +13,6 @@ class PyPlaid(PythonPackage):
 
     maintainers("williampiat3", "casenave", "bstaber")
 
-
     license("MIT", checked_by="casenave")
 
     version("0.1.15", sha256="e596ee155804da31793af0ee8f0e93c5fe629e246cbdca87dcae741a1e1f1205")
