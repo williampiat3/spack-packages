@@ -33,7 +33,7 @@ class Xkblas(CMakePackage):
     depends_on("c", type="build")
     depends_on("cxx", type="build")
     depends_on("hwloc")
-    depends_on("intel-oneapi-mkl", when="+mkl")
+    depends_on("intel-oneapi-mkl threads=openmp mpi_family=openmpi +cluster", when="+mkl")
     depends_on("openblas", when="+openblas")
     ## Tested with CUDA 8,9, 11, 12.0.0 and 13.0.1 without success
     ## Only CUDA 12.9.1 works with xkblas 0.6.0 within my limited testing.
