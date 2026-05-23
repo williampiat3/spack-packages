@@ -55,21 +55,3 @@ class PyPythonMumps(PythonPackage):
 
     patch("patch_xkblas.patch", when="+cuda")
     patch("patch_meson_build.patch")
-
-    def setup_build_environment(self, env):
-        env.set("CC", self.compiler.cc)
-        env.set("CXX", self.compiler.cxx)
-
-    @run_before("install")
-    def setup_meson(self) -> None:
-        """Running meson setup before building the package"""
-        # Building with meson
-        options = []
-        if self.spec["meson"].satisfies("@0.64:"):
-            options.append("setup")
-        options.append(os.path.abspath(self.stage.source_path))
-        options += MesonBuilder.std_args(self)
-        builddir = "builddir"
-        options.append(builddir + "/")
-        with working_dir(join_path(self.build_directory, builddir), create=True):
-            self.module.meson(*options)
