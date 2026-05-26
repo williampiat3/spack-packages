@@ -7,11 +7,12 @@ import os
 import sys
 
 from spack_repo.builtin.build_systems.generic import Package
+from spack_repo.builtin.build_systems.cuda import CudaPackage
 
 from spack.package import *
 
 
-class Mumps(Package):
+class Mumps(Package,CudaPackage):
     """MUMPS: a MUltifrontal Massively Parallel sparse direct Solver"""
 
     homepage = "https://mumps-solver.org/index.php"
@@ -67,7 +68,7 @@ class Mumps(Package):
         + "(warning: might not be supported by all multithread BLAS)",
     )
     variant("pkgconfig", default=False, description="Create unofficial pkgconfig files")
-    variant("cuda", default=False, description="Cuda support for mumps")
+
     depends_on("c", type="build")  # generated
     depends_on("fortran", type="build")  # generated
 
@@ -80,9 +81,9 @@ class Mumps(Package):
     depends_on("scalapack", when="+mpi")
     depends_on("mpi", when="+mpi")
     depends_on("gmake", type="build")
-    ## GPU build
-    depends_on("xkblas",when="+cuda")
-    depends_on("cuda@:12.9.1",when="+cuda" )
+    ## CUDA GPU build
+    depends_on("xkblas +cuda",when="+cuda")
+
 
 
 
