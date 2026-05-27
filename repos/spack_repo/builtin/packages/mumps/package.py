@@ -86,6 +86,7 @@ class Mumps(Package,CudaPackage,ROCmPackage):
     depends_on("xkblas +cuda",when="+cuda")
     depends_on("xkblas ~cuda +rocm",when="+rocm")
     depends_on("hip", when="+rocm")
+    depends_on("hipblas", when="+rocm")
     depends_on("rocblas", when="+rocm")
     
 
@@ -295,8 +296,10 @@ class Mumps(Package,CudaPackage,ROCmPackage):
             optc.append("-DUSE_GPU")
             optc.append("-I{}".format(self.spec["hip"].prefix.include))
             optc.append("-I{}".format(self.spec["rocblas"].prefix.include))
+            optc.append("-I{}".format(self.spec["hipblas"].prefix.include))
             optl.append("-L{}/lib".format(self.spec["hip"].prefix))
             optl.append("-L{}/lib".format(self.spec["rocblas"].prefix))
+            optl.append("-L{}/lib".format(self.spec["hipblas"].prefix))
             optl.append("-lhipblas")
             optl.append("-lrocblas")
          if "+rocm" in self.spec or "+cuda" in self.spec:
