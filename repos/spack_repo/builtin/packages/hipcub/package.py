@@ -106,6 +106,7 @@ class Hipcub(CMakePackage, CudaPackage, ROCmPackage):
     ]:
         depends_on(f"rocm-cmake@{ver}:", type="build", when=f"@{ver}")
         depends_on(f"hip@{ver} +cuda", when=f"+cuda @{ver}")
+        depends_on(f"rocprim@{ver}", when=f"@{ver} +rocm")
         for tgt in ROCmPackage.amdgpu_targets:
             depends_on(
                 f"rocprim@{ver} amdgpu_target={tgt}", when=f"@{ver} +rocm amdgpu_target={tgt}"
@@ -129,6 +130,10 @@ class Hipcub(CMakePackage, CudaPackage, ROCmPackage):
 
     def cmake_args(self):
         args = [self.define("BUILD_TEST", self.run_tests)]
+
+        if self.spec.satisfies("+rocm"):
+            args.append(self.define("ROCPRIM_FETCH_METHOD", "PACKAGE"))
+            args.append(self.define("rocprim_DIR", self.spec["rocprim"].prefix.lib.cmake.rocprim))
 
         if self.spec.satisfies("+rocm ^cmake@3.21.0:3.21.2"):
             args.append(self.define("__skip_rocmclang", "ON"))
